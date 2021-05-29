@@ -71,9 +71,22 @@ const convert = (req,res,next,url) => {
         else hs[_h] = _hs[_h]
     }
     //console.log(hs)
-    if (method === 'POST') config['form'] = params;
-    else config['url'] = config['url'] ? `${config['url']}?${qs.stringify(params)}` : (url?`${url}?${qs.stringify(params)}`:null) ;
+
+    // neil-pan-s 2020-05-30
+    if (method === 'POST') {
+        if (headers['content-type'].includes('application/x-www-form-urlencoded')) { 
+            config['form'] = params; 
+        } else if (headers['content-type'].includes('application/json')) { 
+            config['body'] = JSON.stringify(params);
+        } else {
+            config['body'] = params;
+        }
+    } else {
+        config['url'] = config['url'] ? `${config['url']}?${qs.stringify(params)}` : (url?`${url}?${qs.stringify(params)}`:null) ;
+    }
+    
     config['headers'] = hs;
+    
     return [config,protocol,host,cb,params]
 }
 
